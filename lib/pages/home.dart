@@ -31,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// Komentarz
 Container buildBody(context) {
   return Container(
       child: Column(children: [
