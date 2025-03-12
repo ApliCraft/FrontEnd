@@ -1,0 +1,38 @@
+workflows:
+  ios:
+    name: Build iOS
+    max_build_duration: 120
+    pre_build:
+      # 1. Set the Flutter channel
+      - flutter channel stable
+      - flutter upgrade
+
+      # 2. Clean the Flutter project
+      - flutter clean
+      - flutter pub get
+
+      # 3. Update CocoaPods and install iOS dependencies
+      - cd ios
+      - pod install --repo-update
+      - cd ..
+
+      # 4. Get Flutter dependencies
+      - flutter pub get
+
+    build:
+      ios:
+        target: Runner
+        flutter_build: true
+        build_mode: debug
+        build_arch: x86_64
+
+    post_build:
+      # Post-build steps, e.g., run Flutter doctor
+      - flutter doctor
+
+  android:
+    name: Build Android
+    max_build_duration: 120
+    pre_build:
+      # 1. Set the Flutter channel
+      - flutter channel stabl
