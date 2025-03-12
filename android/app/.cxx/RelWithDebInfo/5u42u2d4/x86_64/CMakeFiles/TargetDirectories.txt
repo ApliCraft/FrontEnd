@@ -1,0 +1,2 @@
+C:/Users/footb/Documents/GitHub/FrontEnd/android/app/.cxx/RelWithDebInfo/5u42u2d4/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/footb/Documents/GitHub/FrontEnd/android/app/.cxx/RelWithDebInfo/5u42u2d4/x86_64/CMakeFiles/rebuild_cache.dir

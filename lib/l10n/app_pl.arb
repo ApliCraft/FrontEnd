@@ -272,5 +272,8 @@
   "confirmNewPassword": "Potwierdź nowe hasło",
   "pleaseConfirmNewPassword": "Proszę potwierdzić nowe hasło",
   "passwordUpdateSuccessful": "Hasło zostało pomyślnie zaktualizowane!",
-  "passwordUpdateFailed": "Nie udało się zaktualizować hasła"
+  "passwordUpdateFailed": "Nie udało się zaktualizować hasła",
+  "quantityInGrams": "Ilość w gramach",
+  "summary": "Podsumowanie",
+  "kcal": "Kalorie"
 }

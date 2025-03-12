@@ -268,5 +268,8 @@
   "confirmNewPassword": "Confirmar Nueva Contraseña",
   "pleaseConfirmNewPassword": "Por favor confirme su nueva contraseña",
   "passwordUpdateSuccessful": "¡Contraseña actualizada exitosamente!",
-  "passwordUpdateFailed": "Error al actualizar la contraseña"
+  "passwordUpdateFailed": "Error al actualizar la contraseña",
+  "quantityInGrams": "Cantidad en gramos",
+  "summary": "Resumen",
+  "kcal": "Calorías"
 }

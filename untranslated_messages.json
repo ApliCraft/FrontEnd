@@ -11,10 +11,7 @@
     "customQuantity",
     "enterCustomQuantity",
     "quantityInMl",
-    "enterAdditiveQuantity",
-    "quantityInGrams",
-    "summary",
-    "kcal"
+    "enterAdditiveQuantity"
   ],
 
   "es": [
@@ -29,10 +26,7 @@
     "customQuantity",
     "enterCustomQuantity",
     "quantityInMl",
-    "enterAdditiveQuantity",
-    "quantityInGrams",
-    "summary",
-    "kcal"
+    "enterAdditiveQuantity"
   ],
 
   "pl": [
@@ -47,9 +41,6 @@
     "customQuantity",
     "enterCustomQuantity",
     "quantityInMl",
-    "enterAdditiveQuantity",
-    "quantityInGrams",
-    "summary",
-    "kcal"
+    "enterAdditiveQuantity"
   ]
 }

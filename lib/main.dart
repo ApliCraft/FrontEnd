@@ -23,17 +23,34 @@ import 'package:timezone/timezone.dart' as tz;
 final storage = const FlutterSecureStorage();
 final GlobalKey<_MyAppState> myAppKey = GlobalKey<_MyAppState>();
 
+// Constants for storage keys and values
+const String darkModeKey = 'darkMode';
+const String localeCodeKey = 'localeCode';
+const String trueValue = 'true';
+const String defaultTimeZone = 'Europe/Warsaw';
+const String envFileName = '.env';
+const String defaultRecipeId = '675d879d90a3b1421c861377';
+const String timezoneMethodChannel = 'com.aplicraft.decideat/timezone';
+const String getTimeZoneMethod = 'getTimeZone';
+
+// Debug message templates
+const String timezoneSuccessMessage = "Successfully got timezone: ";
+const String timezoneFailureMessage = "Failed to get timezone: ";
+
 // Method channel to get time zone from native code.
-const platform = MethodChannel('com.aplicraft.decideat/timezone');
+const platform = MethodChannel(timezoneMethodChannel);
+
+// Global navigator key to access context anywhere
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<String> getLocalTimeZone() async {
   try {
-    final String timeZone = await platform.invokeMethod('getTimeZone');
-    print("Successfully got timezone: $timeZone");
+    final String timeZone = await platform.invokeMethod(getTimeZoneMethod);
+    print(timezoneSuccessMessage + timeZone);
     return timeZone;
   } on PlatformException catch (e) {
-    print("Failed to get timezone: ${e.message}");
-    return 'Europe/Warsaw'; // fallback if native call fails
+    print(timezoneFailureMessage + (e.message ?? ''));
+    return defaultTimeZone; // fallback if native call fails
   }
 }
 
@@ -45,7 +62,7 @@ Future<void> main() async {
   tz.setLocalLocation(tz.getLocation(timeZoneName));
 
   NotificationsService().initNotifications();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: envFileName);
   runApp(MyApp(key: myAppKey));
 }
 
@@ -78,11 +95,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _loadPreferences() async {
-    String? darkMode = await storage.read(key: 'darkMode');
-    String? localeCode = await storage.read(key: 'localeCode');
+    String? darkMode = await storage.read(key: darkModeKey);
+    String? localeCode = await storage.read(key: localeCodeKey);
     if (mounted) {
       setState(() {
-        _isDarkMode = darkMode == 'true';
+        _isDarkMode = darkMode == trueValue;
         if (localeCode != null) _locale = Locale(localeCode);
       });
     }
@@ -92,19 +109,20 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _isDarkMode = darkMode;
     });
-    await storage.write(key: 'darkMode', value: darkMode.toString());
+    await storage.write(key: darkModeKey, value: darkMode.toString());
   }
 
   Future<void> setLocale(Locale locale) async {
     setState(() {
       _locale = locale;
     });
-    await storage.write(key: 'localeCode', value: locale.languageCode);
+    await storage.write(key: localeCodeKey, value: locale.languageCode);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       locale: _locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -138,7 +156,7 @@ class _MyAppState extends State<MyApp> {
         '/settings': (context) => const SettingsPage(),
         '/editProfile': (context) => const EditProfilePage(),
         '/recipe': (context) =>
-            const RecipePage(recipeId: '675d879d90a3b1421c861377'),
+            const RecipePage(recipeId: defaultRecipeId),
         '/chat': (context) => const ChatPage(),
       },
     );
