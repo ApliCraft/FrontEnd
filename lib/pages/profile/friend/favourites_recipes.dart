@@ -4,7 +4,9 @@ import 'package:http/http.dart' as http;
 import '../../../widgets/bottomNavBar.dart';
 import 'friendNavigationAppBar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:decideat/api/api.dart';
+import 'package:decideat/api/api.dart' as api;
+import 'package:decideat/api/recipe.dart';
+import 'package:decideat/pages/recipes.dart'; // for RecipeCard widget
 
 class FriendFavouritesPage extends StatefulWidget {
   final String userId;
@@ -15,65 +17,71 @@ class FriendFavouritesPage extends StatefulWidget {
 }
 
 class _FriendFavouritesPageState extends State<FriendFavouritesPage> {
-  List<Map<String, dynamic>> favouriteRecipes = [];
+  List<Recipe> favouriteRecipes = [];
   bool isLoading = true;
+  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _loadFavouriteRecipes();
+    fetchFriendFavouriteRecipes();
   }
 
-  Future<void> _loadFavouriteRecipes() async {
+  Future<void> fetchFriendFavouriteRecipes() async {
     try {
-      final response = await http.get(
-        Uri.parse('$apiUrl/user/${widget.userId}'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
+      // First refresh token if needed
+      await api.RefreshTokenIfExpired();
+      
+      // Get access token for authentication
+      String? token = await api.storage.read(key: "accessToken");
+      
+      if (token == null) {
+        throw Exception('Not authenticated');
+      }
+      
+      // Fetch friend's liked recipe IDs using the specified endpoint
+      final likedResponse = await http.get(
+        Uri.parse('${api.apiUrl}/user/liked-recipes/${widget.userId}'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 
-      if (response.statusCode == 200) {
-        final userData = jsonDecode(response.body);
-        final List<dynamic> recipeIds = userData['likedRecipes'] is List 
-            ? userData['likedRecipes'] 
-            : [userData['likedRecipes']];
-        List<Map<String, dynamic>> recipes = [];
-
-        // Fetch detailed data for each recipe
-        for (String recipeId in recipeIds) {
-          final recipeResponse = await http.get(
-            Uri.parse('$apiUrl/recipe/$recipeId'),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
-          );
-
-          if (recipeResponse.statusCode == 200) {
-            final recipeData = jsonDecode(recipeResponse.body);
-            recipes.add({
-              'id': recipeId,
-              'name': recipeData['name'] ?? '',
-              'imageUrl': '$apiUrl/${recipeData['imageUrl'] ?? 'images/default_recipe.png'}',
-              'description': recipeData['description'] ?? '',
-              'rating': recipeData['rating'] ?? 0.0,
-            });
-          }
-        }
-
-        setState(() {
-          favouriteRecipes = recipes;
-          isLoading = false;
-        });
-      } else {
-        print('Failed to load user data');
-        setState(() {
-          isLoading = false;
-        });
+      if (likedResponse.statusCode != 200) {
+        throw Exception('Failed to load friend\'s liked recipes');
       }
-    } catch (e) {
-      print('Error loading favourite recipes: $e');
+
+      final List<dynamic> likedRecipeIds = json.decode(likedResponse.body);
+      
+      // Fetch detailed recipe information for each ID
+      List<Recipe> recipes = [];
+      
+      for (var recipeId in likedRecipeIds) {
+        final recipeResponse = await http.get(
+          Uri.parse('${api.apiUrl}/recipe/$recipeId'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (recipeResponse.statusCode == 200) {
+          final recipeData = json.decode(recipeResponse.body);
+          final recipe = Recipe.fromJson(recipeData);
+          // Explicitly mark the recipe as liked since it's in favorites
+          recipe.isLiked = true;
+          recipes.add(recipe);
+        }
+      }
+      
       setState(() {
+        favouriteRecipes = recipes;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error loading recipes: $e';
         isLoading = false;
       });
     }
@@ -82,6 +90,15 @@ class _FriendFavouritesPageState extends State<FriendFavouritesPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Adjust grid columns responsively
+    int crossAxisCount = 2;
+    if (screenWidth > 1200) {
+      crossAxisCount = 4;
+    } else if (screenWidth > 800) {
+      crossAxisCount = 3;
+    }
     
     return Scaffold(
       appBar: FriendNavigationAppBar(
@@ -99,100 +116,41 @@ class _FriendFavouritesPageState extends State<FriendFavouritesPage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : favouriteRecipes.isEmpty
-            ? Center(
-                child: Text(
-                  "No favourite recipes yet",
-                  style: const TextStyle(fontSize: 18),
-                ),
-              )
-            : ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
-                  itemCount: favouriteRecipes.length,
-                  itemBuilder: (context, index) {
-                    final recipe = favouriteRecipes[index];
-                    return Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12),
-                            ),
-                            child: Image.network(
-                              recipe['imageUrl'],
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : errorMessage != null
+                  ? Center(child: Text(errorMessage!))
+                  : favouriteRecipes.isNotEmpty
+                      ? GridView.builder(
+                          itemCount: favouriteRecipes.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.65,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  recipe['name'],
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  recipe['description'],
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 14,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      recipe['rating'].toStringAsFixed(1),
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          itemBuilder: (context, index) {
+                            final recipe = favouriteRecipes[index];
+                            return RecipeCard(
+                              recipe: recipe,
+                              onUpdate: () {
+                                // Just trigger a rebuild to reflect any UI changes
+                                setState(() {});
+                              },
+                            );
+                          },
+                        )
+                      : Center(
+                          child: Text(
+                            "No favourite recipes yet",
+                            style: const TextStyle(fontSize: 18),
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
+                        ),
+        ),
       ),
-      bottomNavigationBar: const BottomNavBar(initialIndex: 4),
+      // bottomNavigationBar: const BottomNavBar(initialIndex: 4),
     );
   }
 } 

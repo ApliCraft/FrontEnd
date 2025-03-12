@@ -297,7 +297,6 @@ class _FriendProfilePageState extends State<FriendProfilePage> {
               ),
             )
           : loading(),
-      bottomNavigationBar: const BottomNavBar(initialIndex: 4),
     );
   }
 } 

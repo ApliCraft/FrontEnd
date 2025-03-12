@@ -329,7 +329,7 @@ class _FriendListPageState extends State<FriendListPage> {
                 ),
               ),
       ),
-      bottomNavigationBar: const BottomNavBar(initialIndex: 4),
+      // bottomNavigationBar: const BottomNavBar(initialIndex: 4),
     );
   }
 } 

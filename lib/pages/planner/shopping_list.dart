@@ -294,14 +294,14 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                     _showCreateListDialog();
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.restaurant_menu, color: Colors.blue),
-                  title: const Text('Generate From Meal Plan'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _showGenerateDialog();
-                  },
-                ),
+                // ListTile(
+                //   leading: const Icon(Icons.restaurant_menu, color: Colors.blue),
+                //   title: const Text('Generate From Meal Plan'),
+                //   onTap: () {
+                //     Navigator.pop(context);
+                //     _showGenerateDialog();
+                //   },
+                // ),
               ],
             ),
           );
@@ -356,16 +356,16 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                OutlinedButton.icon(
-                  onPressed: _showGenerateDialog,
-                  icon: const Icon(Icons.restaurant_menu),
-                  label: const Text('From Meal Plan'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.blue,
-                    side: const BorderSide(color: Colors.blue),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                ),
+                // OutlinedButton.icon(
+                //   onPressed: _showGenerateDialog,
+                //   icon: const Icon(Icons.restaurant_menu),
+                //   label: const Text('From Meal Plan'),
+                //   style: OutlinedButton.styleFrom(
+                //     foregroundColor: Colors.blue,
+                //     side: const BorderSide(color: Colors.blue),
+                //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                //   ),
+                // ),
               ],
             ),
           ],
