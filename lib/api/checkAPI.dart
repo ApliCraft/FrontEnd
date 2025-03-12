@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import './user.dart';
+import 'api.dart';
 
 class CheckAPI extends StatefulWidget {
   const CheckAPI({Key? key}) : super(key: key);
@@ -14,12 +15,13 @@ class _CheckAPIState extends State<CheckAPI> {
   @override
   void initState() {
     super.initState();
-    _checkAPI();
+    checkAPI();
   }
 
-  Future<void> _checkAPI() async {
+  Future<void> checkAPI() async {
     try {
-      final url = Uri.parse('http://192.168.1.38:4000/api/');
+      final url = Uri.parse(apiUrl!.replaceAll('/v1', ''));
+      print(url);
       final response = await http.get(
         url,
         headers: <String, String>{
@@ -47,7 +49,7 @@ class _CheckAPIState extends State<CheckAPI> {
         context,
         MaterialPageRoute(
           builder: (context) => APIFailedScreen(
-            retryFunction: _checkAPI,
+            retryFunction: checkAPI,
           ),
         ),
       );
@@ -103,7 +105,7 @@ class _APIFailedScreenState extends State<APIFailedScreen> {
 
 
     try {
-      final url = Uri.parse('http://localhost:4000/api/');
+      final url = Uri.parse('$apiUrl/api/');
       final response = await http.get(
         url,
         headers: <String, String>{

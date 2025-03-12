@@ -1,0 +1,2 @@
+C:/Users/footb/Documents/GitHub/LastVersionOfFrontEnd/v4/FrontEnd/android/app/.cxx/Debug/2b76f6q5/x86/CMakeFiles/edit_cache.dir
+C:/Users/footb/Documents/GitHub/LastVersionOfFrontEnd/v4/FrontEnd/android/app/.cxx/Debug/2b76f6q5/x86/CMakeFiles/rebuild_cache.dir

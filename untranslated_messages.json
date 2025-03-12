@@ -1,0 +1,55 @@
+{
+  "de": [
+    "fluidType",
+    "coffee",
+    "tea",
+    "additive",
+    "sugar",
+    "honey",
+    "sweetener",
+    "saveShortcut",
+    "customQuantity",
+    "enterCustomQuantity",
+    "quantityInMl",
+    "enterAdditiveQuantity",
+    "quantityInGrams",
+    "summary",
+    "kcal"
+  ],
+
+  "es": [
+    "fluidType",
+    "coffee",
+    "tea",
+    "additive",
+    "sugar",
+    "honey",
+    "sweetener",
+    "saveShortcut",
+    "customQuantity",
+    "enterCustomQuantity",
+    "quantityInMl",
+    "enterAdditiveQuantity",
+    "quantityInGrams",
+    "summary",
+    "kcal"
+  ],
+
+  "pl": [
+    "fluidType",
+    "coffee",
+    "tea",
+    "additive",
+    "sugar",
+    "honey",
+    "sweetener",
+    "saveShortcut",
+    "customQuantity",
+    "enterCustomQuantity",
+    "quantityInMl",
+    "enterAdditiveQuantity",
+    "quantityInGrams",
+    "summary",
+    "kcal"
+  ]
+}
