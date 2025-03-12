@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  libphonenumber_plugin: ^0.3.3
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -92,6 +93,39 @@ flutter:
     - assets/icons/apple.svg
     - assets/default_avatar.png
     - assets/fonts/Roboto-Regular.ttf
+
+    workflows:
+  ios:
+    name: Build iOS
+    max_build_duration: 120
+    pre_build:
+      # 1. Ustawienie kanału Flutter
+      - flutter channel stable
+      - flutter upgrade
+
+      # 2. Wyczyść projekt Flutter
+      - flutter clean
+      - flutter pub get
+
+      # 3. Zaktualizuj CocoaPods i zainstaluj zależności iOS
+      - cd ios
+      - pod install --repo-update
+      - cd ..
+
+      # 4. Inne kroki pre-build, np. build zależności z Flutter
+      - flutter pub get
+
+    build:
+      ios:
+        target: Runner
+        flutter_build: true
+        build_mode: debug
+        build_arch: x86_64
+
+    post_build:
+      # Inne post-build kroki
+      - flutter doctor
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
